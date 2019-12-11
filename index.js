@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 //import routes
 const authRoute = require('./routes/auth')
 const postRoute = require('./routes/post')
+const data ="abcde"
 
 
 dotenv.config();
