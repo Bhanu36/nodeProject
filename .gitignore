@@ -40,5 +40,4 @@ _site/
 .env.development
 .env.production
 .env.staging
-!.env.development.example
-uploads
+
