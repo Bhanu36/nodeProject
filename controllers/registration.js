@@ -5,17 +5,21 @@ const UserSession = require("../model/UserSession").Model;
 const {
   registrationValidation,
   loginValidation
-} = require('../services/validations.service');
+} = require("../services/validations.service");
 
 const register = async (req, res) => {
   try {
+    console.log("@@@@@@@@@@@@@@@2");
     //validate the data before we make a user
     const { error } = registrationValidation(req.body);
     if (error) return res.status(400).send("error in input");
 
     // checking if user already exist
     const emailExist = await User.findOne({ email: req.body.email });
-    if (emailExist) return res.status(400).send("email already Exist");
+    if (emailExist)
+      return res
+        .status(400)
+        .json({ code: 200, message: "email already Exist" });
     // hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -60,41 +64,48 @@ const login = async (req, res) => {
       password: req.body.password,
       authToken: token,
       date: Date.now()
-
     });
     const saveUserSession = await sessionUser.save();
     const responseObject = {
       code: 200,
       message: "logged In successfully",
-      data: token
+      data: {
+        userId: user._id,
+        token: token
+      }
     };
-   return  res.json(responseObject);
+    return res.json(responseObject);
   } catch (err) {
     return res.status(400).send(err);
   }
 };
 
-const logout = async(req,res)=>{
-  const {email,authKey}= req.body
-  const sessionEnd = await UserSession.updateOne({email:email,authToken:authKey},{$set:{date:new Date()}});
-  console.log(sessionEnd);
-  sessionEnd.then((data)=>{
+const logout = async (req, res) => {
+  try {
+    const { email, authKey } = req.body;
+    const sessionEnd = await UserSession.updateOne(
+      { email: email, authToken: authKey },
+      { $set: { updatedAt: new Date(),authToken:"" } }
+    )
+      .then(data => {
+        return res.status(200).json({
+          code: 200,
+          data: data
+        });
+      })
+      .catch(err => {
+        res.status(200).json({
+          code: 200,
+          message: "user not loggedOut"
+        });
+      });
+  } catch (err) {
     return res.status(200).json({
-      code:200,
-      data:sessionEnd
-    })
-
-  }).catch(err=>{
-    res.status(200).json({
-      code:200,
-      message:"user not loggedOut"
-    })
-
-  })
- 
-}
-
-
+      code: 200,
+      message:`error in logout${err}`
+    });
+  }
+};
 
 module.exports = {
   register,

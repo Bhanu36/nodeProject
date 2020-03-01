@@ -1,31 +1,28 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const dotenv = require('dotenv')
-const mongoose = require('mongoose');
-
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+var bodyParser = require("body-parser");
+dotenv.config();
 
 //import routes
-const postRoute = require('./routes/get.routes')
-const regRoute = require('./routes/registration.routes')
+const regRoute = require("./routes/login/registration.routes");
+const authRoute = require("./routes/dashboard/dashboard.routes");
 
-
-dotenv.config();
-//connect to DBc
-mongoose.connect(process.env.DB_CONNECT,
-    { useNewUrlParser: true,useUnifiedTopology:true },
-    () => {
-        console.log("connected DB");
-    })
+//connect to DB
+mongoose.connect(
+  process.env.DB_CONNECT,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  () => {
+    console.log("connected DB");
+  }
+);
 
 //MiddleWare
-app.use(express.json())
-
-
-
-
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 //route middlewares
-app.use('/', regRoute)
-// app.use('/api/user',  )
-app.use('/api/posts',postRoute)
+app.use("/", regRoute);
+app.use("/auth", authRoute);
 
-app.listen(3000, () => console.log('server up and running'))
+app.listen(3000, () => console.log("server up and running"));

@@ -1,16 +1,13 @@
+function response(code, message, data) {
+  const responseObject = {
+    code: code,
+    status: message,
+    data: data
+  };
 
-function response(code,message,data){
-    const responseObject = {
-        code: code,
-        status:message,
-        data:data
-    }
-
-    return res.json(responseObject)
+  return res.json(responseObject);
 }
 
-
-
-module.exports={
-    response
-}
+module.exports = {
+  response
+};

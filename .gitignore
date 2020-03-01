@@ -37,6 +37,7 @@ _site/
 *.bak
 
 # Enviornment Variables
+.env
 .env.development
 .env.production
 .env.staging

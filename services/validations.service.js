@@ -15,7 +15,7 @@ const registrationValidation = registrationData => {
       .required()
   });
   return schema.validate(registrationData);
-}
+};
 
 const loginValidation = registrationData => {
   const schema = Joi.object({
@@ -28,7 +28,7 @@ const loginValidation = registrationData => {
       .required()
   });
   return schema.validate(registrationData);
-}
+};
 
 module.exports = {
   registrationValidation,

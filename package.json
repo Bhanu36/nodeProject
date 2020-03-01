@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "bhanu": "node app.js"
+    "bhanu": "nodemon app.js"
   },
   "author": "",
   "license": "ISC",
