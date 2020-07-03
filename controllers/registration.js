@@ -9,10 +9,9 @@ const {
 
 const register = async (req, res) => {
   try {
-    console.log("@@@@@@@@@@@@@@@2");
     //validate the data before we make a user
     const { error } = registrationValidation(req.body);
-    if (error) return res.status(400).send("error in input");
+    if (error) return res.status(400).send({error:"error in input"});
 
     // checking if user already exist
     const emailExist = await User.findOne({ email: req.body.email });
