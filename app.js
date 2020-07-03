@@ -13,7 +13,7 @@ const authRoute = require("./routes/dashboard/dashboard.routes");
 //connect to DB
 mongoose.connect(
   process.env.DB_CONNECT,
-  { useNewUrlParser: true, useUnifiedTopology: true },
+  { useNewUrlParser: true, useUnifiedTopology: true,useFindAndModify: false },
   () => {
     console.log(process.env.DB_CONNECT)
     console.log("connected DB");
