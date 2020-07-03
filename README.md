@@ -1,2 +1,2 @@
 # nodeProject
-#CRUD code on proect branch, please take pull from project
+#CRUD code on "project" branch, please take pull from project
