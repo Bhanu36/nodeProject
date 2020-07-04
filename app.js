@@ -2,8 +2,10 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-var bodyParser = require("body-parser");
+const bodyParser = require("body-parser");
+const morgan = require('morgan');
 const cors = require('cors');
+const chalk = require('chalk');
 dotenv.config();
 
 //import routes
@@ -24,6 +26,16 @@ mongoose.connect(
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(
+  morgan(function (tokens, req, res) {
+    return chalk.blackBright(
+      `[${tokens.status(req, res)}] ${tokens.url(req, res)} ${tokens.method(
+        req,
+        res
+      )} ----- ${tokens["response-time"](req, res)}`
+    );
+  })
+);
 //route middlewares
 app.use("/", regRoute);
 app.use("/stu",openRoutes)
