@@ -1,7 +1,13 @@
 const router = require("express").Router();
 const { auth } = require("../../middleware/authCheck.service");
-const { dashboard } = require("../../controllers/dashboard");
+const {
+  getUserDetail,
+  logout,
+  getAlluserLIst,
+} = require("../../controllers/dashboard");
 
-router.get("/dashboard/:id", auth, dashboard);
+router.get("/getUserDetail/:id", auth, getUserDetail);
+router.get("/userList", auth, getAlluserLIst);
+router.post("/logout", auth, logout);
 
 module.exports = router;

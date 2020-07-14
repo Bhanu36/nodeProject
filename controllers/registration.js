@@ -2,10 +2,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../model/User").Model;
 const UserSession = require("../model/UserSession").Model;
+const token = process.env.TOKEN_SECRET
 const {
   registrationValidation,
   loginValidation
 } = require("../services/validations.service");
+const client = require("../services/redisConnection.service");
 
 const register = async (req, res) => {
   try {
@@ -39,7 +41,10 @@ const register = async (req, res) => {
 
     return res.send(responseObject);
   } catch (err) {
-    return res.status(400).send(err);
+    return res.status(400).send({
+      code:200,
+      message:err
+    });
   }
 };
 
@@ -55,59 +60,41 @@ const login = async (req, res) => {
     //checking if password exist or not
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if (!validPass) return res.status(400).send("password wrong");
-
     //create and assign a token
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-    const sessionUser = new UserSession({
+    const timeLimit = 60 * 3*1000; // 3mins
+    const expires = Math.floor(Date.now()) + timeLimit;
+    const token = jwt.sign({ _id: user._id,expiresAt: new Date(expires) }, process.env.TOKEN_SECRET);
+    const sessionObj = {
+      userId: user.id,
       email: req.body.email,
       password: req.body.password,
       authToken: token,
-      date: Date.now()
-    });
+      createdAt: new Date(Date.now()),
+      expiresAt: new Date(expires),
+    }
+    const sessionUser = new UserSession(sessionObj);
     const saveUserSession = await sessionUser.save();
+    const redisSave = await client.hmset("tokens", sessionObj); //hget frameworks authToken
     const responseObject = {
       code: 200,
       message: "logged In successfully",
       data: {
-        userId: user._id,
-        token: token
-      }
+        userId: user.id,
+        email: req.body.email,
+        password: req.body.password,
+        authToken: token,
+        createdAt: Date.now(),
+        expiresAt: expires,
+      },
     };
     return res.json(responseObject);
   } catch (err) {
+    console.log(err);
     return res.status(400).send(err);
-  }
-};
-
-const logout = async (req, res) => {
-  try {
-    const { email, authKey } = req.body;
-    const sessionEnd = await UserSession.updateOne(
-      { email: email, authToken: authKey },
-      { $set: { updatedAt: new Date(),authToken:"" } }
-    )
-      .then(data => {
-        return res.status(200).json({
-          code: 200,
-          data: data
-        });
-      })
-      .catch(err => {
-        res.status(200).json({
-          code: 200,
-          message: "user not loggedOut"
-        });
-      });
-  } catch (err) {
-    return res.status(200).json({
-      code: 200,
-      message:`error in logout${err}`
-    });
   }
 };
 
 module.exports = {
   register,
-  login,
-  logout
+  login
 };

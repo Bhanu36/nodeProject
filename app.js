@@ -6,11 +6,11 @@ const bodyParser = require("body-parser");
 const morgan = require('morgan');
 const cors = require('cors');
 const chalk = require('chalk');
+const { client } = require("./services/redisConnection.service");
 dotenv.config();
 
 //import routes
 const regRoute = require("./routes/login/registration.routes");
-const openRoutes = require("./routes/CRUD/student.routes")
 const authRoute = require("./routes/dashboard/dashboard.routes");
 //connect to DB
 mongoose.connect(
@@ -38,7 +38,6 @@ app.use(
 );
 //route middlewares
 app.use("/", regRoute);
-app.use("/stu",openRoutes)
 app.use("/auth", authRoute);
 
 app.listen(process.env.PORT || 3000, () =>
